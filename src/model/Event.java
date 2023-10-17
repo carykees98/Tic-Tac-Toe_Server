@@ -99,9 +99,9 @@ public class Event {
     }
 
     /**
-     * @param status
+     * @param status Value to assign to m_Status
      */
-    public void setEventStatus(EventStatus status) {
+    public void setStatus(EventStatus status) {
         m_Status = status;
     }
 

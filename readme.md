@@ -28,5 +28,6 @@ In your `ServerHandler` class, what happens if you do not override the `run()` f
 
 #### Answer 2:
 
-There isn't a `run` function in `java.Object` for our `run` to override and since `ServerHandler` doesn't inherit from
-anything, `run` should have no issues if it didn't override since there is nothing for it to override.
+There would be an error if run wasn't overridden. Since `ServerHandler` extends `Thread` and `Thread` has a
+method `run`, if you were to call `run` on a `ServerHandler` instance, without overriding, it would use the
+implementation provided by `Thread` and would not produce the expected outcome.

@@ -1,5 +1,6 @@
 package Test;
 
+import model.User;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -7,7 +8,7 @@ import static org.junit.Assert.*;
 public class UserTest {
     // Assuming the User class has the following properties and methods:
     // String username, String password, String displayName, boolean online
-    private User testUser = new User("HAL9000", "PeopleGood", "HAL9k", true);
+    private final User testUser = new User("HAL9000", "PeopleGood", "HAL9k", true);
 
     @Test
     public void testGetUsername() {

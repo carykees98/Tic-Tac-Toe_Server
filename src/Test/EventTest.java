@@ -1,11 +1,13 @@
 package Test;
 
+import model.Event;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EventTest {
-    Event event = new Event(1, "Sender", "Opponent", EventStatus.PENDING, "Turn", 42);
+    Event event = new Event(1, "Sender", "Opponent", Event.EventStatus.PENDING, "Turn", 42);
 
     @Test
     public void getLastMove() {
@@ -47,23 +49,23 @@ public class EventTest {
 
     @Test
     public void getStatus() {
-        Event event1 = new Event(6, "Sender", "Opponent", EventStatus.DECLINED, "Player1", 30);
+        Event event1 = new Event(6, "Sender", "Opponent", Event.EventStatus.DECLINED, "Player1", 30);
         // Ensure that getStatus() returns the correct status
-        assertEquals(EventStatus.DECLINED, event1.getStatus());
+        assertEquals(Event.EventStatus.DECLINED, event1.getStatus());
     }
 
 
     @Test
     public void setEventStatus() {
-        event.setStatus(Eventstatus.ACCEPTED);
-        assertEvents(EventStatud.ACCEPTED, event.getStatus());
+        event.setStatus(Event.EventStatus.ACCEPTED);
+        assertEquals(Event.EventStatus.ACCEPTED, event.getStatus());
     }
 
     @Test
     public void equals() {
         // Create two Event objects with the same eventID
-        Event event1 = new Event(7, "Sender", "Opponent", EventStatus.PENDING, "Player1", 35);
-        Event event2 = new Event(7, "OtherSender", "OtherOpponent", EventStatus.PENDING, "Player2", 35);
+        Event event1 = new Event(7, "Sender", "Opponent", Event.EventStatus.PENDING, "Player1", 35);
+        Event event2 = new Event(7, "OtherSender", "OtherOpponent", Event.EventStatus.PENDING, "Player2", 35);
         // Ensure that the equals method correctly identifies them as equal
         assertTrue(event1.equals(event2));
     }

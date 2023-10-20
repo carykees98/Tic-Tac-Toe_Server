@@ -1,23 +1,22 @@
 package Test;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
-
 import socket.Response;
 
+import static org.junit.Assert.assertEquals;
+
 public class ResponseTest {
-    private Response testResponse = new Response(ResponseStatus.SUCCESS, "Howdy!");
+    private final Response testResponse = new Response(Response.ResponseStatus.SUCCESS, "Howdy!");
 
     @Test
     public void getMessage() {
-        String messaged = testResponse.getMessage();
+        String message = testResponse.getMessage();
         assertEquals("Howdy!", message);
     }
 
     @Test
     public void getStatus() {
-        ResponseStatus status = testResponse.getStatus();
-        assertEquals(ResponseStatus.Success,status);
+        Response.ResponseStatus status = testResponse.getStatus();
+        assertEquals(Response.ResponseStatus.SUCCESS, status);
     }
 }

@@ -17,7 +17,7 @@ public class Event {
     /**
      * Default Constructor for Event
      */
-    Event() {
+    public Event() {
         m_Sender = m_Opponent = m_Turn = "Uninitialized";
         m_EventID = m_LastMove = -1;
         m_Status = null;
@@ -33,7 +33,7 @@ public class Event {
      * @param turn     The username of the player that made the last move
      * @param lastMove An integer storing the last move of the game
      */
-    Event(int eventID, String sender, String opponent, EventStatus status, String turn, int lastMove) {
+    public Event(int eventID, String sender, String opponent, EventStatus status, String turn, int lastMove) {
         m_EventID = eventID;
         m_Sender = sender;
         m_Opponent = opponent;

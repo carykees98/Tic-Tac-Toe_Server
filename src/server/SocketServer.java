@@ -9,14 +9,14 @@ public class SocketServer {
     /**
      * Default constructor for the SocketServer class
      */
-    SocketServer() {
+    public SocketServer() {
         m_Port = 5000;
     }
 
     /**
      * @param port Port for the socket to bind to (between 0 and 65535)
      */
-    SocketServer(int port) {
+    public SocketServer(int port) {
         m_Port = port;
     }
 

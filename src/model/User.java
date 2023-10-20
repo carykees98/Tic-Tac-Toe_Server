@@ -14,7 +14,7 @@ public class User {
     /**
      * Default constructor for a User
      */
-    User() {
+    public User() {
         m_Username = m_Password = m_DisplayName = "Uninitialized";
         m_Online = false;
     }
@@ -25,7 +25,7 @@ public class User {
      * @param displayName A string representation of user’s display name
      * @param online      A Boolean variable to indicate if a user is online or not
      */
-    User(String username, String password, String displayName, boolean online) {
+    public User(String username, String password, String displayName, boolean online) {
         m_Username = username;
         m_Password = password;
         m_DisplayName = displayName;

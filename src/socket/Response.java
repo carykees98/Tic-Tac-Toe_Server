@@ -12,7 +12,7 @@ public class Response {
      * m_status is set to null
      * m_Message is set to "Uninitialized"
      */
-    Response() {
+    public Response() {
         m_Status = null;
         m_Message = "Uninitialized";
     }
@@ -22,7 +22,7 @@ public class Response {
      * @param status ResponseStatus::status
      * @param message string message
      */
-    Response(ResponseStatus status, String message) {
+    public Response(ResponseStatus status, String message) {
         m_Status = status;
         m_Message = message;
     }

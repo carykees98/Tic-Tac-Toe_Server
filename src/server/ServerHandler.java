@@ -4,7 +4,7 @@ package server;
  * Class that handles communication with the SQLite db
  */
 public class ServerHandler {
-    ServerHandler() {
+    public ServerHandler() {
     }
 
     /**

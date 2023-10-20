@@ -10,7 +10,7 @@ public class Request {
     /**
      * Request object default constructor
      */
-    Request() {
+    public Request() {
         m_Type = null;
         m_Data = "Uninitialized";
     }
@@ -20,7 +20,7 @@ public class Request {
      * @param type
      * @param data
      */
-    Request(RequestType type, String data) {
+    public Request(RequestType type, String data) {
         m_Type = type;
         m_Data = data;
     }

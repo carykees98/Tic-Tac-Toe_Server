@@ -11,7 +11,7 @@ public class GamingResponse extends Response {
     /**
      * A default constructor for the class. Must call the constructor of super class
      */
-    GamingResponse() {
+    public GamingResponse() {
         super();
         m_Move = -1;
         m_Active = false;
@@ -24,7 +24,7 @@ public class GamingResponse extends Response {
      * @param move An integer representing the last move made by the current player’s opponent. The value from 0-8 represents the cell of TicTacToe from top-bottom, left-right
      * @param active A boolean variable to indicate if the opponent is still active in the game.
      */
-    GamingResponse(ResponseStatus status, String message, int move, boolean active) {
+    public GamingResponse(ResponseStatus status, String message, int move, boolean active) {
         super(status, message);
         m_Move = move;
         m_Active = active;

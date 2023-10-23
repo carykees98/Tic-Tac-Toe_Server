@@ -1,6 +1,6 @@
 package model;
 
-import org.jetbrains.annotations.NotNull;
+//import org.jetbrains.annotations.NotNull;
 
 /**
  * Class containing information related to a user
@@ -85,7 +85,7 @@ public class User {
      * @param otherUser User object to compare against
      * @return boolean value representing whether two users are equal
      */
-    public boolean equals(@NotNull User otherUser) {
+    public boolean equals(User otherUser) {
         return m_Username.equals(otherUser.m_Username);
     }
 }

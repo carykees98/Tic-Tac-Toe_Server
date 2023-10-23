@@ -1,4 +1,4 @@
-package Test;
+package test;
 
 import model.Event;
 import org.junit.Test;

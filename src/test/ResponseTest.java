@@ -1,4 +1,4 @@
-package Test;
+package test;
 
 import org.junit.Test;
 import socket.Response;

@@ -2,6 +2,7 @@ package Test;
 
 import org.junit.Test;
 import socket.Response;
+import socket.Response.ResponseStatus;
 
 import static org.junit.Assert.*;
 

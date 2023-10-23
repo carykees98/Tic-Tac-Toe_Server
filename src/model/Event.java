@@ -1,6 +1,6 @@
 package model;
 
-import org.jetbrains.annotations.NotNull;
+//import org.jetbrains.annotations.NotNull;
 
 /**
  * Class containing information related to a game / connection event
@@ -109,7 +109,7 @@ public class Event {
      * @param otherEvent Event to compare with
      * @return boolean value representing whether two events are equal
      */
-    public boolean equals(@NotNull Event otherEvent) {
+    public boolean equals(Event otherEvent) {
         return m_EventID == otherEvent.m_EventID;
     }
 

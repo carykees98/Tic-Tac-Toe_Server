@@ -6,7 +6,6 @@ import socket.Response;
 import static org.junit.Assert.*;
 
 public class ResponseTest {
-    Response responsey = new Response(R)
     @Test
     public void getMessage() {
         Response response = new Response(ResponseStatus.SUCCESS, "Test Message");

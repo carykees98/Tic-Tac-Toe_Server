@@ -3,20 +3,19 @@ package Test;
 import org.junit.Test;
 import socket.Response;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ResponseTest {
-    private final Response testResponse = new Response(Response.ResponseStatus.SUCCESS, "Howdy!");
-
+    Response responsey = new Response(R)
     @Test
     public void getMessage() {
-        String message = testResponse.getMessage();
-        assertEquals("Howdy!", message);
+        Response response = new Response(ResponseStatus.SUCCESS, "Test Message");
+        assertEquals("Test Message", response.getMessage());
     }
 
     @Test
     public void getStatus() {
-        Response.ResponseStatus status = testResponse.getStatus();
-        assertEquals(Response.ResponseStatus.SUCCESS, status);
+        Response response = new Response(ResponseStatus.FAILURE, "Test Message");
+        assertEquals(ResponseStatus.FAILURE, response.getStatus());
     }
 }

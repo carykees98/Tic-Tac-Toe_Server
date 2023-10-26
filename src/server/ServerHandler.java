@@ -1,19 +1,42 @@
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import model.Event;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
 
 /**
  * Class that handles communication with the SQLite db
  */
 public class ServerHandler extends Thread {
+    private static Event s_Event = new Event(0, null, null, null, null, -1);
     private Socket m_Socket;
     private String m_Username;
+    private DataInputStream m_DataIn;
+    private DataOutputStream m_DataOut;
+    private Gson m_Gson;
 
     /**
-     * @param socket socket connection to the client
+     * @param socket   socket connection to the client
      * @param username username of connected client
      */
     public ServerHandler(Socket socket, String username) {
+        m_Socket = socket;
+        m_Username = username;
+        m_Gson = new GsonBuilder().serializeNulls().create();
+
+        m_Event = new Event();
+
+        try {
+            m_DataIn = new DataInputStream(socket.getInputStream());
+            m_DataOut = new DataOutputStream(socket.getOutputStream());
+        } catch (java.io.IOException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, "Failed to open data stream");
+        }
     }
 
     /**
@@ -24,7 +47,7 @@ public class ServerHandler extends Thread {
     }
 
     /**
-     *  close() terminates handle to the SQLite db
+     * close() terminates handle to the SQLite db
      */
     public void close() {
     }

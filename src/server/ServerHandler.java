@@ -29,7 +29,7 @@ public class ServerHandler extends Thread {
         m_Username = username;
         m_Gson = new GsonBuilder().serializeNulls().create();
 
-        m_Event = new Event();
+        s_Event = new Event();
 
         try {
             m_DataIn = new DataInputStream(socket.getInputStream());

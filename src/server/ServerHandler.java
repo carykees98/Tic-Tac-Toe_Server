@@ -1,10 +1,19 @@
 package server;
 
+import java.net.Socket;
+
 /**
  * Class that handles communication with the SQLite db
  */
 public class ServerHandler extends Thread {
-    public ServerHandler() {
+    private Socket m_Socket;
+    private String m_Username;
+
+    /**
+     * @param socket socket connection to the client
+     * @param username username of connected client
+     */
+    public ServerHandler(Socket socket, String username) {
     }
 
     /**

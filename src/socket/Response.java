@@ -4,8 +4,8 @@ package socket;
  * Object for server response to a client request
  */
 public class Response {
-    public ResponseStatus m_Status;
-    public String m_Message;
+    private final ResponseStatus m_Status;
+    private final String m_Message;
 
     /**
      * Default constructor for Response Object

@@ -5,11 +5,10 @@ import com.google.gson.GsonBuilder;
 import model.Event;
 import socket.Request;
 import socket.Response;
-import socket.ResponseType;
+import socket.Response.ResponseStatus;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -48,19 +47,6 @@ public class ServerHandler extends Thread {
     @Override
     public void run() {
         // Implement the logic for handling database operations here
-        try{
-            while(true){
-                Request rq = recieveRequest();
-                if (rq == null) break;
-                Response rsp = handleRequest(rq);
-                sendResponse(rsp);
-            }
-        }catch(IOException ioe) {
-            SocketServer.s_Logger.log(Level.SEVERE, "Error during communication with the client");
-        }catch(EOFException eofe) {
-            SocketServer.s_Logger.log(Level.INFO, "Client disconnected");
-            close();
-        }
     }
 
     /**
@@ -77,17 +63,15 @@ public class ServerHandler extends Thread {
     }
 
     public Response handleRequest(Request request) {
-        // Check the request type
         switch (request.getType()) {
             case SEND_MOVE:
-                string move = request.getData();
-                return handleSendMove(stoi(move));
-                case REQUEST_MOVE:
+                String move = request.getData();
+                int moveValue = Integer.parseInt(move);
+                return handleSendMove(moveValue);
+            case REQUEST_MOVE:
                 return handleRequestMove();
-
             default:
-                // Return a failed response for an unknown request type
-                return new Response(ResponseType.FAILED, "Unknown request type");
+                return new Response(Response.ResponseStatus.FAILED, "Unknown request type");
         }
     }
 

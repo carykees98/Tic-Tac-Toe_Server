@@ -71,30 +71,27 @@ public class ServerHandler extends Thread {
             case REQUEST_MOVE:
                 return handleRequestMove();
             default:
-                return new Response(Response.ResponseStatus.FAILED, "Unknown request type");
+                return new Response(Response.ResponseStatus.FAILURE, "Unknown request type");
         }
     }
 
     private Response handleSendMove(int move) {
-        // Check if it's the user's turn to make a move (e.g., last move was not by the user)
         if (s_Event.getTurn() == null || !s_Event.getTurn().equals(m_Username)) {
-            // Set the move and turn attributes of the static variable event
-            s_Event.setMove(move);
+            s_Event.setLastMove(move);
             s_Event.setTurn(m_Username);
-            return new Response(ResponseType.SUCCESS, "Move accepted");
+            return new Response(ResponseStatus.SUCCESS, "Move accepted");
         } else {
-            return new Response(ResponseType.FAILED, "It's not your turn to make a move");
+            return new Response(ResponseStatus.FAILURE, "It's not your turn to make a move");
         }
     }
 
     private Response handleRequestMove() {
-        if (s_Event.getMove() != -1) {
-            int move = s_Event.getMove();
-            // Reset the move once it's sent to the opponent
-            s_Event.setMove(-1);
-            return new Response(ResponseType.SUCCESS, "Opponent's move: " + move);
+        if (s_Event.getLastMove() != -1) {
+            int move = s_Event.getLastMove();
+            s_Event.setLastMove(-1);
+            return new Response(ResponseStatus.SUCCESS, "Opponent's move: " + move);
         } else {
-            return new Response(ResponseType.SUCCESS, "No move from the opponent yet");
+            return new Response(ResponseStatus.SUCCESS, "No move from the opponent yet");
         }
     }
 }

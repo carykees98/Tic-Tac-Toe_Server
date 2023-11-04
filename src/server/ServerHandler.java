@@ -3,9 +3,14 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.Event;
+import socket.Request;
+import socket.Response;
+import socket.ResponseType;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
 
@@ -22,19 +27,17 @@ public class ServerHandler extends Thread {
 
     /**
      * @param socket   socket connection to the client
-     * @param username username of connected client
+     * @param username username of the connected client
      */
     public ServerHandler(Socket socket, String username) {
         m_Socket = socket;
         m_Username = username;
         m_Gson = new GsonBuilder().serializeNulls().create();
 
-        s_Event = new Event();
-
         try {
             m_DataIn = new DataInputStream(socket.getInputStream());
             m_DataOut = new DataOutputStream(socket.getOutputStream());
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             SocketServer.s_Logger.log(Level.SEVERE, "Failed to open data stream");
         }
     }
@@ -44,11 +47,70 @@ public class ServerHandler extends Thread {
      */
     @Override
     public void run() {
+        // Implement the logic for handling database operations here
+        try{
+            while(true){
+                Request rq = recieveRequest();
+                if (rq == null) break;
+                Response rsp = handleRequest(rq);
+                sendResponse(rsp);
+            }
+        }catch(IOException ioe) {
+            SocketServer.s_Logger.log(Level.SEVERE, "Error during communication with the client");
+        }catch(EOFException eofe) {
+            SocketServer.s_Logger.log(Level.INFO, "Client disconnected");
+            close();
+        }
     }
 
     /**
-     * close() terminates handle to the SQLite db
+     * Close() terminates the handle to the SQLite db
      */
     public void close() {
+        try {
+            m_DataIn.close();
+            m_DataOut.close();
+            m_Socket.close();
+        } catch (IOException ioe) {
+            SocketServer.s_Logger.log(Level.SEVERE, "Failed to close socket and streams");
+        }
+    }
+
+    public Response handleRequest(Request request) {
+        // Check the request type
+        switch (request.getType()) {
+            case SEND_MOVE:
+                string move = request.getData();
+                return handleSendMove(stoi(move));
+                case REQUEST_MOVE:
+                return handleRequestMove();
+
+            default:
+                // Return a failed response for an unknown request type
+                return new Response(ResponseType.FAILED, "Unknown request type");
+        }
+    }
+
+    private Response handleSendMove(int move) {
+        // Check if it's the user's turn to make a move (e.g., last move was not by the user)
+        if (s_Event.getTurn() == null || !s_Event.getTurn().equals(m_Username)) {
+            // Set the move and turn attributes of the static variable event
+            s_Event.setMove(move);
+            s_Event.setTurn(m_Username);
+            return new Response(ResponseType.SUCCESS, "Move accepted");
+        } else {
+            return new Response(ResponseType.FAILED, "It's not your turn to make a move");
+        }
+    }
+
+    private Response handleRequestMove() {
+        if (s_Event.getMove() != -1) {
+            int move = s_Event.getMove();
+            // Reset the move once it's sent to the opponent
+            s_Event.setMove(-1);
+            return new Response(ResponseType.SUCCESS, "Opponent's move: " + move);
+        } else {
+            return new Response(ResponseType.SUCCESS, "No move from the opponent yet");
+        }
     }
 }

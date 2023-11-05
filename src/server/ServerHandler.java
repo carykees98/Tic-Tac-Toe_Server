@@ -9,6 +9,7 @@ import socket.Response.ResponseStatus;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -46,11 +47,21 @@ public class ServerHandler extends Thread {
      */
     @Override
     public void run() {
-        // Implement the logic for handling database operations here
+        while (true) {
+            try {
+                Request request = m_Gson.fromJson(m_DataIn.readUTF(), Request.class);
+                m_DataOut.writeUTF(m_Gson.toJson(handleRequest(request)));
+                m_DataOut.flush();
+            } catch (EOFException e) {
+                close();
+            } catch (Exception e) {
+                SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+            }
+        }
     }
 
     /**
-     * Close() terminates the handle to the SQLite db
+     * Close() terminates the socket connection
      */
     public void close() {
         try {

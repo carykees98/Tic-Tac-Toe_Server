@@ -27,14 +27,14 @@ public class Request {
 
     /**
      * Get type of request
-     * @return request tyoe
+     * @return request type
      */
     public RequestType getType() {
         return m_Type;
     }
 
     /**
-     * Ser request tyoe
+     * Set request type
      * @param type value to set request to
      */
     public void setType(RequestType type) {

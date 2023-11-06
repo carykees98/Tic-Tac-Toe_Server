@@ -72,6 +72,8 @@ public class SocketServer {
 
             connection1.join();
             connection2.join();
+
+            System.out.println("shouldn't go here");
         } catch (java.io.IOException e) {
             s_Logger.log(Level.SEVERE, "Failed to accept connection");
         } catch (Exception e) {

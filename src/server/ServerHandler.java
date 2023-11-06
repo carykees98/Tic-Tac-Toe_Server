@@ -8,12 +8,11 @@ import socket.Request;
 import socket.Response;
 import socket.Response.ResponseStatus;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class that handles communication with the SQLite db
@@ -41,6 +40,8 @@ public class ServerHandler extends Thread {
         } catch (IOException e) {
             SocketServer.s_Logger.log(Level.SEVERE, "Failed to open data stream");
         }
+
+        SocketServer.s_Logger.log(Level.INFO, "Connected:" + username);
     }
 
     /**
@@ -52,7 +53,7 @@ public class ServerHandler extends Thread {
             try {
                 Request request = m_Gson.fromJson(m_DataIn.readUTF(), Request.class);
                 String gson = m_Gson.toJson(handleRequest(request));
-                System.out.println(gson);
+                SocketServer.s_Logger.log(Level.INFO, "Response: " + gson);
                 m_DataOut.writeUTF(gson);
                 m_DataOut.flush();
             } catch (EOFException e) {
@@ -89,8 +90,7 @@ public class ServerHandler extends Thread {
                 try {
                     int moveValue = Integer.parseInt(move);
                     return handleSendMove(moveValue);
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
                 }
             case REQUEST_MOVE:

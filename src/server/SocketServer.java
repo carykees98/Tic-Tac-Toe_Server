@@ -48,6 +48,7 @@ public class SocketServer {
             System.exit(-1);
         } catch (IllegalArgumentException e) {
             s_Logger.log(Level.SEVERE, "Invalid port: " + m_Port + ". Shutting down");
+            System.exit(-1);
         } catch (Exception e) {
             s_Logger.log(Level.SEVERE, "ServerSocket threw exception" + e.getMessage());
         }

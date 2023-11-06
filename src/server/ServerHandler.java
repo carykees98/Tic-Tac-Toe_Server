@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.Event;
+import socket.GamingResponse;
 import socket.Request;
 import socket.Response;
 import socket.Response.ResponseStatus;
@@ -61,7 +62,7 @@ public class ServerHandler extends Thread {
     }
 
     /**
-     * Close() terminates the socket connection
+     * terminates the socket connection
      */
     public void close() {
         try {
@@ -73,12 +74,23 @@ public class ServerHandler extends Thread {
         }
     }
 
+    /**
+     * Handles incoming requests from the client
+     *
+     * @param request request sent by client
+     * @return response to the client
+     */
     public Response handleRequest(Request request) {
         switch (request.getType()) {
             case SEND_MOVE:
                 String move = request.getData();
-                int moveValue = Integer.parseInt(move);
-                return handleSendMove(moveValue);
+                try {
+                    int moveValue = Integer.parseInt(move);
+                    return handleSendMove(moveValue);
+                }
+                catch (NumberFormatException e) {
+                    SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+                }
             case REQUEST_MOVE:
                 return handleRequestMove();
             default:
@@ -86,8 +98,14 @@ public class ServerHandler extends Thread {
         }
     }
 
+    /**
+     * Handles move sent by client
+     *
+     * @param move move made by client
+     * @return Response to be sent to the client
+     */
     private Response handleSendMove(int move) {
-        if (s_Event.getTurn() == null || !s_Event.getTurn().equals(m_Username)) {
+        if (!s_Event.getTurn().equals(m_Username)) {
             s_Event.setLastMove(move);
             s_Event.setTurn(m_Username);
             return new Response(ResponseStatus.SUCCESS, "Move accepted");
@@ -96,13 +114,18 @@ public class ServerHandler extends Thread {
         }
     }
 
-    private Response handleRequestMove() {
+    /**
+     * Handles request from client for a new move
+     *
+     * @return response with the most recent move data
+     */
+    private GamingResponse handleRequestMove() {
         if (s_Event.getLastMove() != -1) {
             int move = s_Event.getLastMove();
             s_Event.setLastMove(-1);
-            return new Response(ResponseStatus.SUCCESS, "Opponent's move: " + move);
+            return new GamingResponse(ResponseStatus.SUCCESS, "Opponent's move: " + move, move);
         } else {
-            return new Response(ResponseStatus.SUCCESS, "No move from the opponent yet");
+            return new GamingResponse(ResponseStatus.SUCCESS, "No move from the opponent yet", -1);
         }
     }
 }

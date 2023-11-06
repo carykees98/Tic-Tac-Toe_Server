@@ -51,7 +51,9 @@ public class ServerHandler extends Thread {
         while (true) {
             try {
                 Request request = m_Gson.fromJson(m_DataIn.readUTF(), Request.class);
-                m_DataOut.writeUTF(m_Gson.toJson(handleRequest(request)));
+                String gson = m_Gson.toJson(handleRequest(request));
+                System.out.println(gson);
+                m_DataOut.writeUTF(gson);
                 m_DataOut.flush();
             } catch (EOFException e) {
                 close();
@@ -105,7 +107,7 @@ public class ServerHandler extends Thread {
      * @return Response to be sent to the client
      */
     private Response handleSendMove(int move) {
-        if (!s_Event.getTurn().equals(m_Username)) {
+        if (s_Event.getTurn() == null || !s_Event.getTurn().equals(m_Username)) {
             s_Event.setLastMove(move);
             s_Event.setTurn(m_Username);
             return new Response(ResponseStatus.SUCCESS, "Move accepted");

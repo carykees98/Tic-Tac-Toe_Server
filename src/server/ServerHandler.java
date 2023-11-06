@@ -8,6 +8,7 @@ import socket.Request;
 import socket.Response;
 import socket.Response.ResponseStatus;
 
+import javax.tools.JavaFileObject;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -53,9 +54,10 @@ public class ServerHandler extends Thread {
             try {
                 Request request = m_Gson.fromJson(m_DataIn.readUTF(), Request.class);
                 String gson = m_Gson.toJson(handleRequest(request));
-                SocketServer.s_Logger.log(Level.INFO, "Response: " + gson);
                 m_DataOut.writeUTF(gson);
+                SocketServer.s_Logger.log(Level.INFO, "Response: " + gson);
                 m_DataOut.flush();
+
             } catch (EOFException e) {
                 close();
             } catch (Exception e) {
@@ -122,7 +124,7 @@ public class ServerHandler extends Thread {
      * @return response with the most recent move data
      */
     private GamingResponse handleRequestMove() {
-        if (s_Event.getLastMove() != -1) {
+        if (s_Event.getLastMove() != -1 && !s_Event.getTurn().equals(m_Username)) {
             int move = s_Event.getLastMove();
             s_Event.setLastMove(-1);
             return new GamingResponse(ResponseStatus.SUCCESS, "Opponent's move: " + move, move);

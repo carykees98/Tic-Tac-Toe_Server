@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.Event;
+import model.User;
 import socket.GamingResponse;
 import socket.Request;
 import socket.Response;
@@ -96,6 +97,7 @@ public class ServerHandler extends Thread {
                 return handleRequestMove();
             case LOGIN:
             case REGISTER:
+                return handleRegister();
             case UPDATE_PAIRING:
             case SEND_INVITATION:
             case ACCEPT_INVITATION:
@@ -106,6 +108,20 @@ public class ServerHandler extends Thread {
                 return new Response(Response.ResponseStatus.FAILURE, "Unknown request type");
         }
     }
+
+    private Response handleRegister(User user) {
+        try {
+            if (DatabaseHelper.getInstance().isUsernameExists(user.getUsername()))
+                return new Response(ResponseStatus.FAILURE, "User already Exists");
+
+            DatabaseHelper.getInstance().createUser(user);
+            return new Response(ResponseStatus.SUCCESS, "User Created");
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+            return new Response(ResponseStatus.FAILURE, "Failed to create new user");
+        }
+    }
+
 
     /**
      * Handles move sent by client

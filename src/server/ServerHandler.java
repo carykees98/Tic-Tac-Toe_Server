@@ -122,6 +122,25 @@ public class ServerHandler extends Thread {
         }
     }
 
+    private Response handleLogin(User user) {
+        try {
+            User returnedUser = DatabaseHelper.getInstance().getUser(user.getUsername());
+
+            if (returnedUser != null && returnedUser.getPassword().equals(user.getPassword())) {
+                m_Username = returnedUser.getUsername();
+                returnedUser.setOnlineStatus(true);
+                DatabaseHelper.getInstance().createUser(returnedUser);
+                return new Response(ResponseStatus.SUCCESS, "Successfully Logged in");
+            } else {
+                return new Response(ResponseStatus.FAILURE, "Failed to fetch user");
+            }
+
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+            return new Response(ResponseStatus.FAILURE, "Failed to log user in");
+        }
+    }
+
 
     /**
      * Handles move sent by client

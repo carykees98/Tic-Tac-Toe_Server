@@ -68,9 +68,18 @@ public class ServerHandler extends Thread {
 
     /**
      * terminates the socket connection
+     * Updated for Task 18
      */
     public void close() {
         try {
+            if (m_Username != null) {
+                User user = DatabaseHelper.getInstance().getUser(m_Username);
+                if (user != null) {
+                    user.setOnlineStatus(false);
+                    DatabaseHelper.getInstance().updateUser(user);
+                    DatabaseHelper.getInstance().abortAllUserEvents(m_Username, -1);
+                }
+            }
             m_DataIn.close();
             m_DataOut.close();
             m_Socket.close();
@@ -78,6 +87,7 @@ public class ServerHandler extends Thread {
             SocketServer.s_Logger.log(Level.SEVERE, "Failed to close socket and streams");
         }
     }
+
 
     /**
      * Handles incoming requests from the client
@@ -213,4 +223,139 @@ public class ServerHandler extends Thread {
             return new GamingResponse(ResponseStatus.SUCCESS, "No move from the opponent yet", -1);
         }
     }
+    /*
+    Task 12
+     */
+    private Response handleSendInvitation(String opponent) {
+        if (m_Username == null) {
+            return new Response(ResponseStatus.FAILURE, "User not logged in");
+        }
+
+        if (!DatabaseHelper.getInstance().isUserAvailable(opponent)) {
+            return new Response(ResponseStatus.FAILURE, "Opponent is not available to receive an invitation");
+        }
+
+        Event event = new Event(m_Username, opponent, Event.Status.PENDING, -1);
+        DatabaseHelper.getInstance().createEvent(event);
+        return new Response(ResponseStatus.SUCCESS, "Invitation sent to " + opponent);
+    }
+
+    /*
+    Task 13
+     */
+    private Response handleAcceptInvitation(int eventId) {
+        Event event = DatabaseHelper.getInstance().getEvent(eventId);
+
+        if (event == null || event.getStatus() != Event.Status.PENDING || !event.getOpponent().equals(m_Username)) {
+            return new Response(ResponseStatus.FAILURE, "Invalid invitation or not your invitation to accept");
+        }
+
+        event.setStatus(Event.Status.ACCEPTED);
+        DatabaseHelper.getInstance().abortAllUserEvents(m_Username, eventId);
+        DatabaseHelper.getInstance().updateEvent(event);
+        m_currentEventId = eventId;
+        return new Response(ResponseStatus.SUCCESS, "Invitation accepted");
+    }
+
+    /*
+    Task 14
+     */
+    private Response handleDeclineInvitation(int eventId) {
+        Event event = DatabaseHelper.getInstance().getEvent(eventId);
+
+        if (event == null || event.getStatus() != Event.Status.PENDING || !event.getOpponent().equals(m_Username)) {
+            return new Response(ResponseStatus.FAILURE, "Invalid invitation or not your invitation to decline");
+        }
+
+        event.setStatus(Event.Status.DECLINED);
+        DatabaseHelper.getInstance().updateEvent(event);
+        return new Response(ResponseStatus.SUCCESS, "Invitation declined");
+    }
+
+    /*
+    Task 15
+     */
+    private Response handleAcknowledgeResponse(int eventId) {
+        Event event = DatabaseHelper.getInstance().getEvent(eventId);
+
+        if (event == null || !event.getSender().equals(m_Username)) {
+            return new Response(ResponseStatus.FAILURE, "Invalid event or not your response to acknowledge");
+        }
+
+        if (event.getStatus() == Event.Status.DECLINED) {
+            event.setStatus(Event.Status.ABORTED);
+        } else if (event.getStatus() == Event.Status.ACCEPTED) {
+            DatabaseHelper.getInstance().abortAllUserEvents(m_Username, eventId);
+            m_currentEventId = eventId;
+        }
+
+        DatabaseHelper.getInstance().updateEvent(event);
+        return new Response(ResponseStatus.SUCCESS, "Response acknowledged");
+    }
+
+    /*
+    Task 16
+     */
+    private Response handleCompleteGame() {
+        Event event = DatabaseHelper.getInstance().getEvent(m_currentEventId);
+
+        if (event == null || event.getStatus() != Event.Status.PLAYING) {
+            return new Response(ResponseStatus.FAILURE, "Invalid event or not a game in progress");
+        }
+
+        event.setStatus(Event.Status.COMPLETED);
+        DatabaseHelper.getInstance().updateEvent(event);
+        m_currentEventId = -1;
+        return new Response(ResponseStatus.SUCCESS, "Game completed");
+    }
+
+    private Response handleAbortGame() {
+        Event event = DatabaseHelper.getInstance().getEvent(m_currentEventId);
+
+        if (event == null || event.getStatus() != Event.Status.PLAYING) {
+            return new Response(ResponseStatus.FAILURE, "Invalid event or not a game in progress");
+        }
+
+        event.setStatus(Event.Status.ABORTED);
+        DatabaseHelper.getInstance().updateEvent(event);
+        m_currentEventId = -1;
+        return new Response(ResponseStatus.SUCCESS, "Game aborted");
+    }
+
+
+    /*
+    Task 17
+     */
+    private GamingResponse handleRequestMove() {
+        try {
+            Event currentEvent = DatabaseHelper.getInstance().getEvent(m_currentEventId);
+
+            boolean active = true;
+            String message = "Opponent's move: ";
+
+            if (currentEvent.getStatus() == Event.Status.ABORTED) {
+                active = false;
+                message = "Opponent Abort";
+            } else if (currentEvent.getStatus() == Event.Status.COMPLETED) {
+                active = false;
+                message = "Opponent Deny Play Again";
+            }
+
+            if (currentEvent.getMove() != -1 && !currentEvent.getTurn().equals(m_Username)) {
+                int move = currentEvent.getMove();
+                currentEvent.setMove(-1);
+                currentEvent.setTurn("");
+                DatabaseHelper.getInstance().updateEvent(currentEvent);
+                return new GamingResponse(ResponseStatus.SUCCESS, message + move, move, active);
+            } else {
+                return new GamingResponse(ResponseStatus.SUCCESS, "No move from the opponent yet", -1, active);
+            }
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+            return new GamingResponse(ResponseStatus.FAILURE, "Failed to retrieve move", -1, true);
+        }
+    }
+
+
 }
+

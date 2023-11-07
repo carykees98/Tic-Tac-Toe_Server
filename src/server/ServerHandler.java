@@ -8,18 +8,19 @@ import socket.Request;
 import socket.Response;
 import socket.Response.ResponseStatus;
 
-import javax.tools.JavaFileObject;
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that handles communication with the SQLite db
  */
 public class ServerHandler extends Thread {
-    private static Event s_Event = new Event(0, null, null, null, null, -1);
+    private int m_currentEventId;
     private Socket m_Socket;
     private String m_Username;
     private DataInputStream m_DataIn;
@@ -27,12 +28,10 @@ public class ServerHandler extends Thread {
     private Gson m_Gson;
 
     /**
-     * @param socket   socket connection to the client
-     * @param username username of the connected client
+     * @param socket socket connection to the client
      */
-    public ServerHandler(Socket socket, String username) {
+    public ServerHandler(Socket socket) {
         m_Socket = socket;
-        m_Username = username;
         m_Gson = new GsonBuilder().serializeNulls().create();
 
         try {
@@ -41,8 +40,6 @@ public class ServerHandler extends Thread {
         } catch (IOException e) {
             SocketServer.s_Logger.log(Level.SEVERE, "Failed to open data stream");
         }
-
-        SocketServer.s_Logger.log(Level.INFO, "Connected:" + username);
     }
 
     /**
@@ -109,11 +106,18 @@ public class ServerHandler extends Thread {
      * @return Response to be sent to the client
      */
     private Response handleSendMove(int move) {
-        if (s_Event.getTurn() == null || !s_Event.getTurn().equals(m_Username)) {
-            s_Event.setLastMove(move);
-            s_Event.setTurn(m_Username);
-            return new Response(ResponseStatus.SUCCESS, "Move accepted");
-        } else {
+        try {
+            Event currentEvent = DatabaseHelper.getInstance().getEvent(m_currentEventId);
+            if (currentEvent.getTurn() == null || !currentEvent.getTurn().equals(m_Username)) {
+                currentEvent.setMove(move);
+                currentEvent.setTurn(m_Username);
+                DatabaseHelper.getInstance().updateEvent(currentEvent);
+                return new Response(ResponseStatus.SUCCESS, "Move accepted");
+            } else {
+                return new Response(ResponseStatus.FAILURE, "It's not your turn to make a move");
+            }
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
             return new Response(ResponseStatus.FAILURE, "It's not your turn to make a move");
         }
     }
@@ -124,11 +128,19 @@ public class ServerHandler extends Thread {
      * @return response with the most recent move data
      */
     private GamingResponse handleRequestMove() {
-        if (s_Event.getLastMove() != -1 && !s_Event.getTurn().equals(m_Username)) {
-            int move = s_Event.getLastMove();
-            s_Event.setLastMove(-1);
-            return new GamingResponse(ResponseStatus.SUCCESS, "Opponent's move: " + move, move);
-        } else {
+        try {
+            Event currentEvent = DatabaseHelper.getInstance().getEvent(m_currentEventId);
+            if (currentEvent.getMove() != -1 && !currentEvent.getTurn().equals(m_Username)) {
+                int move = currentEvent.getMove();
+                currentEvent.setMove(-1);
+                currentEvent.setTurn("");
+                DatabaseHelper.getInstance().updateEvent(currentEvent);
+                return new GamingResponse(ResponseStatus.SUCCESS, "Opponent's move: " + move, move);
+            } else {
+                return new GamingResponse(ResponseStatus.SUCCESS, "No move from the opponent yet", -1);
+            }
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
             return new GamingResponse(ResponseStatus.SUCCESS, "No move from the opponent yet", -1);
         }
     }

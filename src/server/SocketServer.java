@@ -1,6 +1,7 @@
 package server;
 
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,26 +62,17 @@ public class SocketServer {
      * Tells the socket to start accepting requests from clients
      */
     public void startAcceptingRequest() {
-        ServerHandler connection1;
-        ServerHandler connection2;
+        ArrayList<ServerHandler> connections = new ArrayList<>();
         try {
-            connection1 = new ServerHandler(m_Socket.accept(), "Connection 1");
-            connection2 = new ServerHandler(m_Socket.accept(), "Connection 2");
-
-            connection1.start();
-            connection2.start();
-
-            connection1.join();
-            connection2.join();
-
-            System.out.println("shouldn't go here");
+            while (true) {
+                connections.add(new ServerHandler(m_Socket.accept()));
+                connections.get(connections.size() - 1).start();
+            }
         } catch (java.io.IOException e) {
             s_Logger.log(Level.SEVERE, "Failed to accept connection");
         } catch (Exception e) {
             s_Logger.log(Level.SEVERE, e.getMessage());
         }
-
-
     }
 
     /**

@@ -12,14 +12,14 @@ public class Event {
     private final String m_Opponent;
     private EventStatus m_Status;
     private String m_Turn;
-    private int m_LastMove;
+    private int m_Move;
 
     /**
      * Default Constructor for Event
      */
     public Event() {
         m_Sender = m_Opponent = m_Turn = "Uninitialized";
-        m_EventID = m_LastMove = -1;
+        m_EventID = m_Move = -1;
         m_Status = null;
     }
 
@@ -39,21 +39,21 @@ public class Event {
         m_Opponent = opponent;
         m_Status = status;
         m_Turn = turn;
-        m_LastMove = lastMove;
+        m_Move = lastMove;
     }
 
     /**
      * @return Returns value of m_LastMove
      */
-    public int getLastMove() {
-        return m_LastMove;
+    public int getMove() {
+        return m_Move;
     }
 
     /**
      * @param lastMove Value to assign to m_LastMove
      */
-    public void setLastMove(int lastMove) {
-        m_LastMove = lastMove;
+    public void setMove(int lastMove) {
+        m_Move = lastMove;
     }
 
     /**
@@ -87,7 +87,7 @@ public class Event {
     /**
      * @return Returns value of m_EventID
      */
-    public int getEventID() {
+    public int getEventId() {
         return m_EventID;
     }
 

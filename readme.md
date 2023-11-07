@@ -34,11 +34,17 @@ implementation provided by `Thread` and would not produce the expected outcome.z
 
 ## Milestone 2
 
+TicTacToe Server: [Repo](https://github.com/carykees98/Tic-Tac-Toe_Server)
+
+In this milestone, we implemented networking between two clients and a server. One client send a move to the server
+while the other one sends requests for move updates. This allows each client to send moves when they are made and for
+the other client to receive them within a reasonable period of time. We had to make the server multithreaded so that it
+could handle requests from multiple clients simultaneously.
+
 ### Question 1:
 
 Do you have a working System that allows two players to play TicTacToe once? If Yes, support your answer with
-screenshots of the gameplay at the
-beginning, mid-game, and game over. If No, explain your progress and challenges.
+screenshots of the gameplay at the beginning, mid-game, and game over. If No, explain your progress and challenges.
 
 #### Answer 1:
 

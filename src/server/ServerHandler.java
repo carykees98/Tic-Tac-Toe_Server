@@ -5,10 +5,12 @@ import com.google.gson.GsonBuilder;
 import model.Event;
 import model.User;
 import socket.GamingResponse;
+import socket.PairingResponse;
 import socket.Request;
 import socket.Response;
 import socket.Response.ResponseStatus;
 
+import javax.xml.crypto.Data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -106,6 +108,30 @@ public class ServerHandler extends Thread {
             case COMPLETE_GAME:
             default:
                 return new Response(Response.ResponseStatus.FAILURE, "Unknown request type");
+        }
+    }
+
+    private PairingResponse handleUpdatePairing() {
+        if (m_Username == null)
+            return new PairingResponse(ResponseStatus.FAILURE,
+                    "User not logged in",
+                    null,
+                    null,
+                    null);
+
+        try {
+            return new PairingResponse(ResponseStatus.SUCCESS,
+                    "Success",
+                    DatabaseHelper.getInstance().getAvailableUsers(m_Username),
+                    DatabaseHelper.getInstance().getUserInvitation(m_Username),
+                    DatabaseHelper.getInstance().getUserInvitationResponse(m_Username));
+        } catch (SQLException e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
+            return new PairingResponse(ResponseStatus.FAILURE,
+                    "Database Action Failed",
+                    null,
+                    null,
+                    null);
         }
     }
 

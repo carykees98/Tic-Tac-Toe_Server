@@ -4,20 +4,21 @@ import model.Event;
 import model.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PairingResponse extends Response {
-    private ArrayList<User> m_availableUsers;
+    private List<User> m_availableUsers;
     private Event m_invitation;
     private Event m_invitationResponse;
 
-    PairingResponse() {
+    public PairingResponse() {
         super(null, null);
         m_availableUsers = null;
         m_invitation = null;
         m_invitationResponse = null;
     }
 
-    PairingResponse(ResponseStatus status, String message, ArrayList<User> availableUsers, Event invitation, Event invitationResponse) {
+    public PairingResponse(ResponseStatus status, String message, List<User> availableUsers, Event invitation, Event invitationResponse) {
         super(status, message);
         m_availableUsers = availableUsers;
         m_invitation = invitation;
@@ -25,11 +26,11 @@ public class PairingResponse extends Response {
     }
 
 
-    public ArrayList<User> getAvailableUsers() {
+    public List<User> getAvailableUsers() {
         return m_availableUsers;
     }
 
-    public void setAvailableUsers(ArrayList<User> availableUsers) {
+    public void setAvailableUsers(List<User> availableUsers) {
         m_availableUsers = availableUsers;
     }
 

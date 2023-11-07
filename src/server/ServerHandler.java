@@ -94,6 +94,14 @@ public class ServerHandler extends Thread {
                 }
             case REQUEST_MOVE:
                 return handleRequestMove();
+            case LOGIN:
+            case REGISTER:
+            case UPDATE_PAIRING:
+            case SEND_INVITATION:
+            case ACCEPT_INVITATION:
+            case ACKNOWLEDGE_RESPONSE:
+            case ABORT_GAME:
+            case COMPLETE_GAME:
             default:
                 return new Response(Response.ResponseStatus.FAILURE, "Unknown request type");
         }

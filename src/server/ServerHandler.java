@@ -22,12 +22,12 @@ import java.util.logging.Level;
  * Class that handles communication with the SQLite db
  */
 public class ServerHandler extends Thread {
-    private int m_currentEventId;
     private final Socket m_Socket;
+    private final Gson m_Gson;
+    private int m_currentEventId;
     private String m_Username;
     private DataInputStream m_DataIn;
     private DataOutputStream m_DataOut;
-    private final Gson m_Gson;
 
     /**
      * @param socket socket connection to the client

@@ -183,7 +183,10 @@ public class ServerHandler extends Thread {
     private Response handleLogin(User user) {
         Response result;
         try {
+            SocketServer.s_Logger.log(Level.INFO, user.getUsername());
             User returnedUser = DatabaseHelper.getInstance().getUser(user.getUsername());
+
+            SocketServer.s_Logger.log(Level.INFO, Boolean.toString(returnedUser == null));
 
             if (returnedUser != null && returnedUser.getPassword().equals(user.getPassword())) {
                 m_Username = returnedUser.getUsername();

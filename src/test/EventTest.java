@@ -11,13 +11,13 @@ public class EventTest {
 
     @Test
     public void getLastMove() {
-        assertEquals(42, event.getLastMove());
+        assertEquals(42, event.getMove());
     }
 
     @Test
     public void setLastMove() {
-        event.setLastMove(57);
-        assertEquals(57, event.getLastMove());
+        event.setMove(57);
+        assertEquals(57, event.getMove());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class EventTest {
 
     @Test
     public void getEventID() {
-        assertEquals(1, event.getEventID());
+        assertEquals(1, event.getEventId());
     }
 
     @Test

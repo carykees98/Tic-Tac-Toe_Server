@@ -101,4 +101,55 @@ not compulsory.
 Yes. It is possible to not loop through all the buttons. This could be achieved using a modified `ButtonHandler` that
 uses `setTag` and `getTag` methods from android's view class. In this case `setTag` could be used to give every button a
 unique tag in the format `row:col` where row and col are the positions of the button. `getTag` could then be used to
-retrieve the tag that matches the button in the `onClick` method. 
+retrieve the tag that matches the button in the `onClick` method.
+
+## Milestone 2
+
+In this milestone we implemented the connection to the database that we are going to be using. We changed our existing
+code in a variety of locations to make it interface with the database and also wrote tests to make sure that the
+connection to the database and the sending of events is working as intended.
+
+### Question 1:
+
+Show output for each test case after running `PairingTest`. If you are not getting an expected output, explain your
+challenges in each test case.
+
+#### Answer 1:
+
+### Question 2:
+
+What is the difference between `COMPLETE_GAME` and `ABORT_GAME` requests?
+
+#### Answer 2:
+
+`COMPLETE_GAME` indicates that the game was completed properly and that the connected client is able to play another
+game. `ABORT_GAME` indicates that the game was improperly completed and that the client is not available to play again.
+
+### Question 3:
+
+With the current implementation, can two users login to the system using the same account credentials? Why or Why not?
+
+#### Answer 3:
+
+Currently, two users with the same credentials can log in to the system. This is because the players online status is
+not checked in handleLogin before logging the user in.
+
+### Question 4:
+
+Explain the stages of `EventStatus` and object `Event` class goes through in the game process. Use the *“The Flow of
+Game `Event`”* diagram above as a guide.
+
+#### Answer 4:
+
+Player one sends an invitation to player 2. Player two can either accept it or decline it. In the case of a declined
+invitation, the game is aborted. If the invitation is accepted, then you proceed to the playing state. From there you
+can go to one of two states, a completed game or and aborted one. If the game is aborted then the players move on to a
+new game. If the game is completed then they do the same but the game will be complete.
+
+### Question 5:
+
+In Part 2 - Task 3, the code snippet given to you clears the database before starting the server. Is it necessary? What
+happens to your test if that line is removed?
+
+#### Answer 5:
+

@@ -17,24 +17,34 @@ import com.google.gson.GsonBuilder;
 
 public class PairingTest {
 
-    private User user1, user2, user3, user4;
-    private SocketClientHelper clientHelper1, clientHelper2, clientHelper3, clientHelper4;
-
-    Thread mainThread = new Thread(() -> {
-        try {
-            DatabaseHelper.getInstance().truncateTables();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        SocketServer.main(null);
-    });
-    mainThread.start();
-    Thread.sleep(1000);
+    private static User user1;
+    private static User user2;
+    private static User user3;
+    private static User user4;
+    private static SocketClientHelper clientHelper1;
+    private static SocketClientHelper clientHelper2;
+    private static SocketClientHelper clientHelper3;
+    private static SocketClientHelper clientHelper4;
 
     Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
     @BeforeClass
-    public void setUp() {
+    public static void setUp() {
+        Thread mainThread = new Thread(() -> {
+            try {
+                DatabaseHelper.getInstance().truncateTables();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            SocketServer.main(null);
+        });
+        mainThread.start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         // Initialize User objects with unique usernames and display names
         user1 = new User("username1", "passwdName1", "u1", true);
         user2 = new User("username2", "passwdName2", "u2", true);
@@ -260,7 +270,7 @@ public class PairingTest {
         Response response = clientHelper1.sendRequest(sendInvitationRequest, Response.class);
 
         assertNotNull(response);
-        assertEquals(Response.ResponseStatus.SUCCESS, response.getType());
+        assertEquals(Response.ResponseStatus.SUCCESS, response.getStatus());
     }
 
     /*

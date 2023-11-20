@@ -144,7 +144,12 @@ public class ServerHandler extends Thread {
             return new PairingResponse(ResponseStatus.FAILURE, "User not logged in", null, null, null);
 
         try {
-            return new PairingResponse(ResponseStatus.SUCCESS, "Success", DatabaseHelper.getInstance().getAvailableUsers(m_Username), DatabaseHelper.getInstance().getUserInvitation(m_Username), DatabaseHelper.getInstance().getUserInvitationResponse(m_Username));
+            Event invitation = DatabaseHelper.getInstance().getUserInvitation(m_Username);
+            Event invitationResponse = DatabaseHelper.getInstance().getUserInvitationResponse(m_Username);
+
+            if (invitation != null) m_currentEventId = invitation.getEventId();
+
+            return new PairingResponse(ResponseStatus.SUCCESS, "Success", DatabaseHelper.getInstance().getAvailableUsers(m_Username), invitation, invitationResponse);
         } catch (SQLException e) {
             SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
             return new PairingResponse(ResponseStatus.FAILURE, "Database Action Failed", null, null, null);
@@ -164,6 +169,7 @@ public class ServerHandler extends Thread {
                 result = new Response(ResponseStatus.FAILURE, "User already Exists");
             } else {
                 DatabaseHelper.getInstance().createUser(user);
+                SocketServer.s_Logger.log(Level.INFO, DatabaseHelper.getInstance().getUser(user.getUsername()).getUsername());
                 result = new Response(ResponseStatus.SUCCESS, "User Created");
             }
 
@@ -188,10 +194,15 @@ public class ServerHandler extends Thread {
 
             SocketServer.s_Logger.log(Level.INFO, Boolean.toString(returnedUser == null));
 
+            if (returnedUser != null) System.out.println(returnedUser.getPassword() + " " + (user.getPassword()));
+
             if (returnedUser != null && returnedUser.getPassword().equals(user.getPassword())) {
+                System.out.println("Logged in user:" + user.getUsername());
                 m_Username = returnedUser.getUsername();
+
                 returnedUser.setOnlineStatus(true);
-                DatabaseHelper.getInstance().createUser(returnedUser);
+                DatabaseHelper.getInstance().updateUser(returnedUser);
+                System.out.println(DatabaseHelper.getInstance().getUser(m_Username).isOnline());
                 result = new Response(ResponseStatus.SUCCESS, "Successfully Logged in");
             } else {
                 result = new Response(ResponseStatus.FAILURE, "Failed to fetch user");
@@ -246,9 +257,9 @@ public class ServerHandler extends Thread {
             } else {
                 Event event = new Event(m_currentEventId, m_Username, opponent, Event.EventStatus.PENDING, null, -1);
                 DatabaseHelper.getInstance().createEvent(event);
+                m_currentEventId = DatabaseHelper.getInstance().getUserInvitation(opponent).getEventId();
                 result = new Response(ResponseStatus.SUCCESS, "Invitation sent to " + opponent);
             }
-
         } catch (SQLException e) {
             SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
             result = new Response(ResponseStatus.FAILURE, "Failed to send invitation");
@@ -298,6 +309,8 @@ public class ServerHandler extends Thread {
         try {
             Event event = DatabaseHelper.getInstance().getEvent(eventId);
 
+            System.out.println(eventId);
+
             if (event == null || event.getStatus() != Event.EventStatus.PENDING || !event.getOpponent().equals(m_Username)) {
                 result = new Response(ResponseStatus.FAILURE, "Invalid invitation or not your invitation to decline");
             } else {
@@ -325,7 +338,9 @@ public class ServerHandler extends Thread {
     private Response handleAcknowledgeResponse(int eventId) {
         Response result;
         try {
+            System.out.println(eventId);
             Event event = DatabaseHelper.getInstance().getEvent(eventId);
+            System.out.println(event == null);
 
             if (event == null || !event.getSender().equals(m_Username)) {
                 result = new Response(ResponseStatus.FAILURE, "Invalid event or not your response to acknowledge");

@@ -3,7 +3,6 @@ package socket;
 import model.Event;
 import model.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PairingResponse extends Response {

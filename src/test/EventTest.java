@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class EventTest {
-    Event event = new Event(1, "Sender", "Opponent", Event.EventStatus.PENDING, "Turn", 42);
+    final Event event = new Event(1, "Sender", "Opponent", Event.EventStatus.PENDING, "Turn", 42);
 
     @Test
     public void getLastMove() {

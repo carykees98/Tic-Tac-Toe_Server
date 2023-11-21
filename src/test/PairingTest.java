@@ -27,6 +27,7 @@ public class PairingTest {
     private static SocketClientHelper clientHelper2;
     private static SocketClientHelper clientHelper3;
     private static SocketClientHelper clientHelper4;
+    private static int currentEventId;
 
     final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
@@ -226,8 +227,8 @@ public class PairingTest {
     public void test10() {
         clientHelper4 = new SocketClientHelper();
 
-        Request loginRequest_u4 = new Request(Request.RequestType.LOGIN, gson.toJson(user4));
-        Response response_u4 = clientHelper4.sendRequest(loginRequest_u4, Response.class);
+        Request loginRequest = new Request(Request.RequestType.LOGIN, gson.toJson(user4));
+        Response response_u4 = clientHelper4.sendRequest(loginRequest, Response.class);
         System.out.println(gson.toJson(response_u4));
 
         assertNotNull(response_u4);
@@ -264,6 +265,8 @@ public class PairingTest {
 
         assertNotNull(pairingResponse);
         assertNotNull(pairingResponse.getInvitation());
+        currentEventId = pairingResponse.getInvitation().getEventId();
+        System.out.println(Integer.toString(currentEventId));
     }
 
     /*
@@ -274,7 +277,8 @@ public class PairingTest {
         // Test 13
         // Send a DECLINE_INVITATION with user2 of the invitation above.
         // It should return a SUCCESS response.
-        Request request = new Request(Request.RequestType.DECLINE_INVITATION, "");
+        System.out.println(Integer.toString(currentEventId));
+        Request request = new Request(Request.RequestType.DECLINE_INVITATION, Integer.toString(currentEventId));
         Response response = clientHelper2.sendRequest(request, Response.class);
         System.out.println(gson.toJson(response));
 
@@ -306,7 +310,7 @@ public class PairingTest {
         // Test 15
         // Send an ACKNOWLEDGE_INVITATION request with user1.
         // It should return a SUCCESS response.
-        Request request = new Request(Request.RequestType.ACKNOWLEDGE_RESPONSE, "");
+        Request request = new Request(Request.RequestType.ACKNOWLEDGE_RESPONSE, Integer.toString(currentEventId));
         Response response = clientHelper1.sendRequest(request, Response.class);
         System.out.println(gson.toJson(response));
 
@@ -344,6 +348,7 @@ public class PairingTest {
 
         assertNotNull(pairingResponse);
         assertNotNull(pairingResponse.getInvitation());
+        currentEventId = pairingResponse.getInvitation().getEventId();
     }
 
     /*
@@ -354,7 +359,7 @@ public class PairingTest {
         // Test 18
         // Send an ACCEPTED_INVITATION with user3 of the invitation above.
         // It should return a SUCCESS response.
-        Request request = new Request(Request.RequestType.ACCEPT_INVITATION, "");
+        Request request = new Request(Request.RequestType.ACCEPT_INVITATION, Integer.toString(currentEventId));
         Response pairingResponse = clientHelper3.sendRequest(request, Response.class);
         System.out.println(gson.toJson(pairingResponse));
 
@@ -383,7 +388,7 @@ public class PairingTest {
         // Test 20
         // Send an ACKNOWLEDGE_INVITATION request with user1.
         // It should return a SUCCESS response.
-        Request request = new Request(Request.RequestType.ACKNOWLEDGE_RESPONSE, "");
+        Request request = new Request(Request.RequestType.ACKNOWLEDGE_RESPONSE, Integer.toString(currentEventId));
         Response pairingResponse = clientHelper1.sendRequest(request, Response.class);
         System.out.println(gson.toJson(pairingResponse));
 
@@ -418,7 +423,8 @@ public class PairingTest {
         // Test 22
         // Send an ABORT_GAME request with user1.
         // It should return a SUCCESS response.
-        Request request = new Request(Request.RequestType.ABORT_GAME, "");
+        System.out.println(currentEventId);
+        Request request = new Request(Request.RequestType.ABORT_GAME, Integer.toString(currentEventId));
         Response pairingResponse = clientHelper1.sendRequest(request, Response.class);
         System.out.println(gson.toJson(pairingResponse));
 

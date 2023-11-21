@@ -49,21 +49,21 @@ public class ServerHandler extends Thread {
      */
     @Override
     public void run() {
-        while (true) {
-            try {
+        try {
+            while (true) {
                 Request request = m_Gson.fromJson(m_DataIn.readUTF(), Request.class);
                 String gson = m_Gson.toJson(handleRequest(request));
                 m_DataOut.writeUTF(gson);
                 SocketServer.s_Logger.log(Level.INFO, "Response: " + gson);
                 m_DataOut.flush();
-
-            } catch (EOFException e) {
-                close();
-            } catch (Exception e) {
-                SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
             }
+        } catch (EOFException e) {
+            close();
+        } catch (Exception e) {
+            SocketServer.s_Logger.log(Level.SEVERE, e.getMessage());
         }
     }
+
 
     /**
      * terminates the socket connection
@@ -120,11 +120,11 @@ public class ServerHandler extends Thread {
                 user = m_Gson.fromJson(request.getData(), User.class);
                 return handleSendInvitation(user.getUsername());
             case ACCEPT_INVITATION:
-                return handleAcceptInvitation(m_currentEventId);
+                return handleAcceptInvitation(Integer.parseInt(request.getData()));
             case DECLINE_INVITATION:
-                return handleDeclineInvitation(m_currentEventId);
+                return handleDeclineInvitation(Integer.parseInt(request.getData()));
             case ACKNOWLEDGE_RESPONSE:
-                return handleAcknowledgeResponse(m_currentEventId);
+                return handleAcknowledgeResponse(Integer.parseInt(request.getData()));
             case ABORT_GAME:
                 return handleAbortGame();
             case COMPLETE_GAME:
@@ -148,6 +148,7 @@ public class ServerHandler extends Thread {
             Event invitationResponse = DatabaseHelper.getInstance().getUserInvitationResponse(m_Username);
 
             if (invitation != null) m_currentEventId = invitation.getEventId();
+            System.out.println(DatabaseHelper.getInstance().getAvailableUsers(""));
 
             return new PairingResponse(ResponseStatus.SUCCESS, "Success", DatabaseHelper.getInstance().getAvailableUsers(m_Username), invitation, invitationResponse);
         } catch (SQLException e) {
@@ -201,8 +202,9 @@ public class ServerHandler extends Thread {
                 m_Username = returnedUser.getUsername();
 
                 returnedUser.setOnlineStatus(true);
+                System.out.println(returnedUser.isOnline());
                 DatabaseHelper.getInstance().updateUser(returnedUser);
-                System.out.println(DatabaseHelper.getInstance().getUser(m_Username).isOnline());
+                System.out.println(DatabaseHelper.getInstance().getAvailableUsers(""));
                 result = new Response(ResponseStatus.SUCCESS, "Successfully Logged in");
             } else {
                 result = new Response(ResponseStatus.FAILURE, "Failed to fetch user");
@@ -348,8 +350,8 @@ public class ServerHandler extends Thread {
                 if (event.getStatus() == Event.EventStatus.DECLINED) {
                     event.setStatus(Event.EventStatus.ABORTED);
                 } else if (event.getStatus() == Event.EventStatus.ACCEPTED) {
-                    DatabaseHelper.getInstance().abortAllUserEvents(m_Username);
-                    m_currentEventId = eventId;
+                    event.setStatus(Event.EventStatus.PLAYING);
+                    DatabaseHelper.getInstance().updateEvent(event);
                 }
                 DatabaseHelper.getInstance().updateEvent(event);
                 result = new Response(ResponseStatus.SUCCESS, "Response acknowledged");
@@ -396,6 +398,7 @@ public class ServerHandler extends Thread {
     private Response handleAbortGame() {
         Response result;
         try {
+            System.out.println(m_currentEventId);
             Event event = DatabaseHelper.getInstance().getEvent(m_currentEventId);
 
 

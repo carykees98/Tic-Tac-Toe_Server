@@ -116,14 +116,16 @@ challenges in each test case.
 
 #### Answer 1:
 
+![Pairing Test Results](./Report-Images/PairingTestResults.png)
+
 ### Question 2:
 
 What is the difference between `COMPLETE_GAME` and `ABORT_GAME` requests?
 
 #### Answer 2:
 
-`COMPLETE_GAME` indicates that the game was completed properly and that the connected client is able to play another
-game. `ABORT_GAME` indicates that the game was improperly completed and that the client is not available to play again.
+`COMPLETE_GAME` indicates that the game was completed properly. `ABORT_GAME` indicates that the game was improperly
+completed or that a game invitation was rejected.
 
 ### Question 3:
 
@@ -153,3 +155,5 @@ happens to your test if that line is removed?
 
 #### Answer 5:
 
+That line is necessary. If that line is removed, the register tests would no longer function as intended because the
+user would already exist.
